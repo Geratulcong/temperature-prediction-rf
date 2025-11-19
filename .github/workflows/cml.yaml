@@ -1,33 +1,46 @@
-name: CI for Temperature Prediction
+name: Weather Data Analysis with Random Forest
 
-on: [push]
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
-  build:
+  analyze-weather:
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
-
+      uses: actions/checkout@v4
+      
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.8'
-
+        python-version: '3.9'
+        
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-
-    - name: Run training
-      run: python train.py
-
+        
+    - name: Run weather analysis
+      run: |
+        python weather_analysis.py
+        
     - name: Upload results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: temperature-results
+        name: weather-analysis-results
         path: |
-          temperature_plot.png
-          temperature_model.pkl
-          temperature_data.csv
+          weather_analysis_results.png
+          model_results.txt
+        retention-days: 30
+        
+    - name: Upload data file (for reference)
+      uses: actions/upload-artifact@v4
+      with:
+        name: original-data
+        path: data.csv
+        retention-days: 30
